@@ -1,0 +1,29 @@
+rules:
+  - id: unity-insecure-storage
+    message: |
+      PlayerPrefs stores data in cleartext which can be accessed by attackers.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-312: Cleartext Storage of Sensitive Information"
+      owasp:
+        - "M2: Insecure Data Storage"
+      category: security
+      technology:
+        - unity
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - insecure-storage
+        - unity
+        - security
+    patterns:
+      - pattern-either:
+          - pattern: PlayerPrefs.SetString($KEY, $DATA)
+          - pattern: PlayerPrefs.SetInt($KEY, $DATA)
+          - pattern: PlayerPrefs.SetFloat($KEY, $DATA)
+    note: |
+      ## Remediation
+      Avoid storing sensitive data in PlayerPrefs or encrypt values before storage.

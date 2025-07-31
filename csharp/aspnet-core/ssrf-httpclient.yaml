@@ -1,0 +1,29 @@
+rules:
+  - id: aspnet-core-ssrf-httpclient
+    message: |
+      Using HttpClient with user-controlled URLs may allow SSRF attacks.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-918: Server-Side Request Forgery (SSRF)"
+      owasp:
+        - "A10:2021 - Server-Side Request Forgery"
+      category: security
+      technology:
+        - aspnet-core
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - ssrf
+        - aspnet-core
+        - security
+    patterns:
+      - pattern: HttpClient().GetAsync($URL)
+      - metavariable-pattern:
+          metavariable: $URL
+          pattern: Request.$SRC[$KEY]
+    note: |
+      ## Remediation
+      Validate or restrict user-supplied URLs when making outbound requests.

@@ -1,0 +1,26 @@
+rules:
+  - id: xamarin-log-injection
+    message: |
+      Logging unsanitized input may allow log injection attacks.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-117: Improper Output Neutralization for Logs"
+      owasp:
+        - "M9: Reverse Engineering"
+      category: security
+      technology:
+        - xamarin
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - logging
+        - xamarin
+        - security
+    patterns:
+      - pattern: Log.Debug($TAG, $DATA)
+    note: |
+      ## Remediation
+      Avoid logging sensitive or untrusted data.

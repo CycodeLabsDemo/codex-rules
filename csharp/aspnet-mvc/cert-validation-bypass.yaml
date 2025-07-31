@@ -1,0 +1,26 @@
+rules:
+  - id: aspnet-mvc-cert-validation-bypass
+    message: |
+      Disabling certificate validation exposes the app to MITM attacks.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-295: Improper Certificate Validation"
+      owasp:
+        - "M3: Insecure Communication"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - certificate-validation
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true
+    note: |
+      ## Remediation
+      Remove callbacks that accept all certificates or implement proper validation.

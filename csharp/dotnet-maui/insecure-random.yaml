@@ -1,0 +1,26 @@
+rules:
+  - id: dotnet-maui-insecure-random
+    message: |
+      System.Random should not be used for cryptographic purposes in MAUI apps.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-338: Use of Cryptographically Weak PRNG"
+      owasp:
+        - "A02:2021 - Cryptographic Failures"
+      category: security
+      technology:
+        - dotnet-maui
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - weak-random
+        - dotnet-maui
+        - security
+    patterns:
+      - pattern: new System.Random()
+    note: |
+      ## Remediation
+      Use RandomNumberGenerator for security-sensitive randomness.

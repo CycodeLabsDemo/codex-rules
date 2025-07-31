@@ -1,0 +1,29 @@
+rules:
+  - id: dotnet-maui-insecure-webview
+    message: |
+      Loading untrusted content in WebView can lead to XSS or phishing attacks.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-749: Exposed Dangerous Method or Function"
+      owasp:
+        - "M7: Client Code Quality"
+      category: security
+      technology:
+        - dotnet-maui
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - webview
+        - dotnet-maui
+        - security
+    patterns:
+      - pattern: WebView.Source = $SRC
+      - metavariable-pattern:
+          metavariable: $SRC
+          pattern: Request.$PARAM[$KEY]
+    note: |
+      ## Remediation
+      Validate URLs before loading content into WebView and disable JavaScript if not needed.

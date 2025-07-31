@@ -1,0 +1,30 @@
+rules:
+  - id: dotnet-maui-log-injection
+    message: |
+      Logging unsanitized input can cause log injection attacks.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-117: Improper Output Neutralization for Logs"
+      owasp:
+        - "M9: Reverse Engineering"
+      category: security
+      technology:
+        - dotnet-maui
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - logging
+        - dotnet-maui
+        - security
+    patterns:
+      - pattern: logger.LogDebug($MSG)
+      - metavariable-pattern:
+          metavariable: $MSG
+          patterns:
+            - pattern: Preferences.Get($KEY, "")
+    note: |
+      ## Remediation
+      Sanitize or encode untrusted data before logging.

@@ -1,0 +1,26 @@
+rules:
+  - id: xamarin-insecure-random
+    message: |
+      System.Random should not be used for security tokens on mobile apps.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-338: Use of Cryptographically Weak PRNG"
+      owasp:
+        - "M2: Insecure Data Storage"
+      category: security
+      technology:
+        - xamarin
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - randomness
+        - xamarin
+        - security
+    patterns:
+      - pattern: new Random()
+    note: |
+      ## Remediation
+      Use RandomNumberGenerator.Create() instead of System.Random.

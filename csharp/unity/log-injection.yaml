@@ -1,0 +1,29 @@
+rules:
+  - id: unity-log-injection
+    message: |
+      Logging untrusted input with Debug.Log may lead to log injection or exposure of sensitive data.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-117: Improper Output Neutralization for Logs"
+      owasp:
+        - "A09:2021 - Security Logging and Monitoring Failures"
+      category: security
+      technology:
+        - unity
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - log-injection
+        - unity
+        - security
+    patterns:
+      - pattern: Debug.Log($MSG)
+      - metavariable-pattern:
+          metavariable: $MSG
+          pattern: Request.$SRC[$KEY]
+    note: |
+      ## Remediation
+      Sanitize log messages or avoid logging untrusted user input.

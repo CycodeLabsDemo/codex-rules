@@ -1,0 +1,26 @@
+rules:
+  - id: xamarin-insecure-clipboard
+    message: |
+      Copying sensitive data to the clipboard can leak information to other apps.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-312: Cleartext Storage of Sensitive Information"
+      owasp:
+        - "M2: Insecure Data Storage"
+      category: security
+      technology:
+        - xamarin
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - clipboard
+        - xamarin
+        - security
+    patterns:
+      - pattern: await Clipboard.SetTextAsync($DATA)
+    note: |
+      ## Remediation
+      Avoid copying sensitive data to the clipboard.

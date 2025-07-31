@@ -1,0 +1,2 @@
+// ruleid: xamarin-backup-enabled
+<application android:allowBackup="true" />

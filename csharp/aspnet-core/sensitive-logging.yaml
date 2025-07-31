@@ -1,0 +1,31 @@
+rules:
+  - id: aspnet-core-sensitive-logging
+    message: |
+      Logging untrusted or sensitive data may leak information.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-532: Insertion of Sensitive Information into Log File"
+      owasp:
+        - "A09:2021 - Security Logging and Monitoring Failures"
+      category: security
+      technology:
+        - aspnet-core
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - sensitive-logging
+        - aspnet-core
+        - security
+    patterns:
+      - pattern-either:
+          - pattern: logger.LogInformation($DATA)
+          - pattern: logger.LogError($DATA)
+      - metavariable-pattern:
+          metavariable: $DATA
+          pattern: Request.$SRC[$KEY]
+    note: |
+      ## Remediation
+      Avoid logging sensitive or user-provided data.

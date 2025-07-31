@@ -1,0 +1,26 @@
+rules:
+  - id: aspnet-mvc-xss-html-raw
+    message: |
+      Rendering raw HTML with Html.Raw can lead to XSS if the content contains scripts.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+      owasp:
+        - "A03:2021 - Injection"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - xss
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: Html.Raw($INPUT)
+    note: |
+      ## Remediation
+      Avoid Html.Raw or sanitize the content before rendering.

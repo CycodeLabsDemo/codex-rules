@@ -1,0 +1,26 @@
+rules:
+  - id: aspnet-mvc-request-validation-disabled
+    message: |
+      Disabling request validation can expose the application to XSS and injection attacks.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-20: Improper Input Validation"
+      owasp:
+        - "A03:2021 - Injection"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - input-validation
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: "[ValidateInput(false)]"
+    note: |
+      ## Remediation
+      Enable request validation or manually validate all input.

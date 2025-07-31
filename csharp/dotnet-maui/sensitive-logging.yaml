@@ -1,0 +1,32 @@
+rules:
+  - id: dotnet-maui-sensitive-logging
+    message: |
+      Logging sensitive information may expose user data.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-532: Insertion of Sensitive Information into Log File"
+      owasp:
+        - "A09:2021 - Security Logging and Monitoring Failures"
+      category: security
+      technology:
+        - dotnet-maui
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - sensitive-logging
+        - dotnet-maui
+        - security
+    patterns:
+      - pattern-either:
+          - pattern: logger.LogInformation($DATA)
+          - pattern: Debug.WriteLine($DATA)
+      - metavariable-pattern:
+          metavariable: $DATA
+          patterns:
+            - pattern: Request.$SRC[$KEY]
+    note: |
+      ## Remediation
+      Avoid logging sensitive data or sanitize it before logging.

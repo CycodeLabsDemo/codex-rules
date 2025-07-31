@@ -1,0 +1,28 @@
+rules:
+  - id: dotnet-maui-sql-injection
+    message: |
+      Building SQL queries with string concatenation can lead to SQL injection.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+      owasp:
+        - "A03:2021 - Injection"
+      category: security
+      technology:
+        - dotnet-maui
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - sql-injection
+        - dotnet-maui
+        - security
+    patterns:
+      - pattern-either:
+          - pattern: $DB.Execute($QUERY + $USERINPUT)
+          - pattern: $DB.Execute(string.Format($FMT, $USERINPUT))
+    note: |
+      ## Remediation
+      Use parameterized queries or ORM frameworks instead of string concatenation.

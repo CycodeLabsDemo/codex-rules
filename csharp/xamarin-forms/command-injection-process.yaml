@@ -1,0 +1,28 @@
+rules:
+  - id: xamarin-command-injection-process
+    message: |
+      Process.Start with user-controlled input can lead to command injection.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')"
+      owasp:
+        - "A03:2021 - Injection"
+      category: security
+      technology:
+        - xamarin
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - command-injection
+        - xamarin
+        - security
+    patterns:
+      - pattern-either:
+          - pattern: Process.Start($CMD)
+          - pattern: System.Diagnostics.Process.Start($CMD)
+    note: |
+      ## Remediation
+      Avoid executing system commands with untrusted input.

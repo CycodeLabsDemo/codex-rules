@@ -1,0 +1,62 @@
+rules:
+  - id: xamarin-insecure-webview
+    message: |
+      WebView configured with user-supplied content or JavaScript evaluation can lead to XSS or phishing attacks.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-749: Exposed Dangerous Method or Function"
+      owasp:
+        - "M7: Client Code Quality"
+      category: security
+      technology:
+        - xamarin
+        - webview
+      references:
+        - https://learn.microsoft.com/xamarin/cross-platform/app-fundamentals/webview
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - webview
+        - xamarin
+        - security
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: $WEBVIEW.Source = $INPUT
+              - metavariable-pattern:
+                  metavariable: $INPUT
+                  patterns:
+                    - pattern-either:
+                        - pattern: Preferences.Get($KEY, ...)
+                        - pattern: Request.$SRC[$KEY]
+          - patterns:
+              - pattern: $WEBVIEW.LoadUrl($INPUT)
+              - metavariable-pattern:
+                  metavariable: $INPUT
+                  patterns:
+                    - pattern: Preferences.Get($KEY, ...)
+          - patterns:
+              - pattern: $WEBVIEW.Eval($SCRIPT)
+              - pattern-not: $WEBVIEW.Eval("...")
+    note: |
+      ## Remediation
+
+      1. **Validate URLs before loading**:
+         ```csharp
+         var url = Preferences.Get("url", string.Empty);
+         if(Uri.TryCreate(url, UriKind.Absolute, out var parsed) && parsed.Scheme == Uri.UriSchemeHttps)
+         {
+             webView.Source = parsed.ToString();
+         }
+         ```
+
+      2. **Avoid executing arbitrary scripts with Eval**:
+         ```csharp
+         // Bad
+         webView.Eval(userScript);
+
+         // Good
+         // Use C# callbacks or message handlers instead
+         ```

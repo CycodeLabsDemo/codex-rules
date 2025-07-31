@@ -1,0 +1,55 @@
+rules:
+  - id: dotnet-maui-insecure-http
+    message: |
+      HTTP used instead of HTTPS for network requests. Plain text communication can be intercepted or modified.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-319: Cleartext Transmission of Sensitive Information"
+      owasp:
+        - "M3: Insecure Communication"
+      category: security
+      technology:
+        - dotnet-maui
+      references:
+        - https://learn.microsoft.com/dotnet/maui
+      labels:
+        - insecure-http
+        - dotnet-maui
+        - security
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: $CLIENT.GetAsync($URL, ...)
+              - metavariable-regex:
+                  metavariable: $URL
+                  regex: '^"http://'
+          - patterns:
+              - pattern: $CLIENT.PostAsync($URL, ...)
+              - metavariable-regex:
+                  metavariable: $URL
+                  regex: '^"http://'
+          - patterns:
+              - pattern: new HttpRequestMessage(HttpMethod.$METHOD, $URL)
+              - metavariable-regex:
+                  metavariable: $URL
+                  regex: '^"http://'
+          - patterns:
+              - pattern: WebRequest.Create($URL)
+              - metavariable-regex:
+                  metavariable: $URL
+                  regex: '^"http://'
+    note: |
+      ## Remediation
+
+      1. **Use HTTPS for all network requests**:
+         ```csharp
+         await client.GetAsync("https://example.com/api");
+         ```
+
+      2. **Enforce HTTPS with a base address**:
+         ```csharp
+         var client = new HttpClient { BaseAddress = new Uri("https://example.com/") };
+         ```

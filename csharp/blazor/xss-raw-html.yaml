@@ -1,0 +1,212 @@
+rules:
+  - id: blazor-xss-raw-html
+    message: |
+      Cross-Site Scripting (XSS) vulnerability detected. Using MarkupString or rendering raw HTML without sanitization can execute malicious scripts.
+      This bypasses Blazor's built-in XSS protection and can lead to account takeover or data theft.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+      owasp:
+        - "A03:2021 - Injection"
+      category: security
+      technology:
+        - blazor
+        - dotnet
+      references:
+        - https://docs.microsoft.com/en-us/aspnet/core/blazor/security/
+        - https://docs.microsoft.com/en-us/aspnet/core/security/cross-site-scripting
+        - https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+      labels:
+        - xss
+        - blazor
+        - security
+    patterns:
+      - pattern-either:
+          # Direct MarkupString with user input
+          - patterns:
+              - pattern-either:
+                  - pattern: (MarkupString)$INPUT
+                  - pattern: new MarkupString($INPUT)
+                  - pattern: MarkupString($INPUT)
+              - pattern-not: new MarkupString("...")
+              - metavariable-pattern:
+                  metavariable: $INPUT
+                  patterns:
+                    - pattern-either:
+                        - pattern: $PARAM
+                        - pattern: $MODEL.$PROPERTY
+          # BuildRenderTree with raw HTML
+          - patterns:
+              - pattern: |
+                  $BUILDER.AddMarkupContent(..., $CONTENT)
+              - metavariable-pattern:
+                  metavariable: $CONTENT
+                  patterns:
+                    - pattern-not: "..."
+          # JavaScript interop with user input
+          - patterns:
+              - pattern-either:
+                  - pattern: $JS.InvokeVoidAsync("eval", $INPUT)
+                  - pattern: $JS.InvokeAsync<$TYPE>("eval", $INPUT)
+                  - pattern: $JS.InvokeVoidAsync($METHOD, $INPUT)
+              - metavariable-pattern:
+                  metavariable: $METHOD
+                  patterns:
+                    - pattern-regex: ".*innerHTML.*"
+    note: |
+      ## Remediation
+      
+      1. **Use Blazor's built-in encoding**:
+         ```csharp
+         @* Bad - Renders raw HTML *@
+         @((MarkupString)UserInput)
+         @((MarkupString)Model.Description)
+         
+         @* Good - Automatically HTML encoded *@
+         @UserInput
+         @Model.Description
+         ```
+      
+      2. **Sanitize HTML when necessary**:
+         ```csharp
+         @using Ganss.XSS
+         
+         @code {
+             private HtmlSanitizer sanitizer = new HtmlSanitizer();
+             private MarkupString sanitizedHtml;
+             
+             protected override void OnInitialized()
+             {
+                 // Configure allowed tags and attributes
+                 sanitizer.AllowedTags.Clear();
+                 sanitizer.AllowedTags.Add("p");
+                 sanitizer.AllowedTags.Add("br");
+                 sanitizer.AllowedTags.Add("strong");
+                 sanitizer.AllowedTags.Add("em");
+                 
+                 // Sanitize user input
+                 var clean = sanitizer.Sanitize(UserContent);
+                 sanitizedHtml = new MarkupString(clean);
+             }
+         }
+         
+         @* Now safe to render *@
+         @sanitizedHtml
+         ```
+      
+      3. **Use components instead of raw HTML**:
+         ```csharp
+         @* Bad - Building HTML strings *@
+         @code {
+             private MarkupString BuildUserCard(string name, string bio)
+             {
+                 return new MarkupString($"<div class='card'><h3>{name}</h3><p>{bio}</p></div>");
+             }
+         }
+         
+         @* Good - Use a component *@
+         <UserCard Name="@name" Bio="@bio" />
+         
+         @* UserCard.razor *@
+         <div class="card">
+             <h3>@Name</h3>
+             <p>@Bio</p>
+         </div>
+         
+         @code {
+             [Parameter] public string Name { get; set; }
+             [Parameter] public string Bio { get; set; }
+         }
+         ```
+      
+      4. **Validate and escape in JavaScript interop**:
+         ```csharp
+         @inject IJSRuntime JSRuntime
+         
+         @code {
+             // Bad
+             private async Task UpdateContent(string content)
+             {
+                 await JSRuntime.InvokeVoidAsync("updateInnerHTML", "contentDiv", content);
+             }
+             
+             // Good - Pass as text
+             private async Task UpdateContentSafe(string content)
+             {
+                 await JSRuntime.InvokeVoidAsync("updateTextContent", "contentDiv", content);
+             }
+         }
+         
+         // JavaScript
+         window.updateTextContent = (elementId, text) => {
+             const element = document.getElementById(elementId);
+             if (element) {
+                 element.textContent = text; // Safe - no HTML parsing
+             }
+         };
+         ```
+      
+      5. **Use Content Security Policy**:
+         ```csharp
+         // In Startup.cs or Program.cs
+         app.Use(async (context, next) =>
+         {
+             context.Response.Headers.Add(
+                 "Content-Security-Policy",
+                 "default-src 'self'; " +
+                 "script-src 'self' 'unsafe-eval'; " + // Required for Blazor
+                 "style-src 'self' 'unsafe-inline';" // Required for Blazor
+             );
+             await next();
+         });
+         ```
+      
+      6. **Create safe HTML helpers**:
+         ```csharp
+         public static class HtmlHelpers
+         {
+             private static readonly HtmlSanitizer Sanitizer = new HtmlSanitizer();
+             
+             static HtmlHelpers()
+             {
+                 // Configure sanitizer
+                 Sanitizer.AllowedSchemes.Add("https");
+                 Sanitizer.AllowedTags.Remove("script");
+                 Sanitizer.AllowedTags.Remove("iframe");
+             }
+             
+             public static MarkupString SanitizeHtml(string html)
+             {
+                 if (string.IsNullOrEmpty(html))
+                     return new MarkupString(string.Empty);
+                     
+                 return new MarkupString(Sanitizer.Sanitize(html));
+             }
+             
+             public static string HtmlEncode(string text)
+             {
+                 return System.Net.WebUtility.HtmlEncode(text);
+             }
+         }
+         ```
+      
+      7. **Implement custom render fragments**:
+         ```csharp
+         @* Instead of raw HTML, use RenderFragment *@
+         
+         @code {
+             private RenderFragment CreateContent(string text) => builder =>
+             {
+                 builder.OpenElement(0, "div");
+                 builder.AddAttribute(1, "class", "content");
+                 builder.AddContent(2, text); // Automatically encoded
+                 builder.CloseElement();
+             };
+         }
+         
+         @* Usage *@
+         @CreateContent(UserInput)
+         ``` 

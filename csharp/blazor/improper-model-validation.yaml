@@ -1,0 +1,29 @@
+rules:
+  - id: blazor-improper-model-validation
+    message: |
+      Components should validate EditForm models using EditContext.Validate.
+    severity: WARNING
+    languages:
+      - generic
+    metadata:
+      cwe:
+        - "CWE-20: Improper Input Validation"
+      owasp:
+        - "A01:2021 - Broken Access Control"
+      category: security
+      technology:
+        - blazor
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - validation
+        - blazor
+        - security
+    patterns:
+      - pattern-regex: '<EditForm\s+Model=".*"\s+OnValidSubmit=".*".*>'
+      - pattern-not-inside: |
+          EditContext $CTX = new EditContext($MODEL);
+          $CTX.Validate();
+    note: |
+      ## Remediation
+      Use EditContext.Validate or DataAnnotations to validate forms.

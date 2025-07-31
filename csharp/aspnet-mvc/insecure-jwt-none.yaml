@@ -1,0 +1,26 @@
+rules:
+  - id: aspnet-mvc-insecure-jwt-none
+    message: |
+      Allowing the "none" algorithm in JWT tokens is insecure.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-347: Improper Verification of Cryptographic Signature"
+      owasp:
+        - "A02:2021 - Cryptographic Failures"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - jwt
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: new JwtSecurityTokenHandler { TokenValidationParameters = { RequireSignedTokens = false } }
+    note: |
+      ## Remediation
+      Require signed tokens and validate algorithms explicitly.

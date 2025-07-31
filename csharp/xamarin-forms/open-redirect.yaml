@@ -1,0 +1,28 @@
+rules:
+  - id: xamarin-open-redirect
+    message: |
+      Using WebView or Browser to navigate to user-supplied URLs can allow open redirect attacks.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
+      owasp:
+        - "A01:2021 - Broken Access Control"
+      category: security
+      technology:
+        - xamarin
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - open-redirect
+        - xamarin
+        - security
+    patterns:
+      - pattern-either:
+          - pattern: Browser.OpenAsync($URL)
+          - pattern: WebView.Source = $URL
+    note: |
+      ## Remediation
+      Validate or restrict external URLs before navigating.

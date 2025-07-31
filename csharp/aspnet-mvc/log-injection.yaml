@@ -1,0 +1,30 @@
+rules:
+  - id: aspnet-mvc-log-injection
+    message: |
+      Logging unsanitized user input can allow log injection attacks.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-117: Improper Output Neutralization for Logs"
+      owasp:
+        - "A03:2021 - Injection"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - logging
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: logger.LogError($MSG)
+      - metavariable-pattern:
+          metavariable: $MSG
+          patterns:
+            - pattern: Request.Query[$PARAM]
+    note: |
+      ## Remediation
+      Sanitize or encode user input before logging.

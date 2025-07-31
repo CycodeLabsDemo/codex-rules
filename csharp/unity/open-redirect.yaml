@@ -1,0 +1,31 @@
+rules:
+  - id: unity-open-redirect
+    message: |
+      Opening arbitrary URLs with Application.OpenURL allows attackers to redirect users.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
+      owasp:
+        - "A01:2021 - Broken Access Control"
+      category: security
+      technology:
+        - unity
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - open-redirect
+        - unity
+        - security
+    patterns:
+      - pattern: Application.OpenURL($URL)
+      - metavariable-pattern:
+          metavariable: $URL
+          patterns:
+            - pattern: Request.$SRC[$KEY]
+            - pattern: PlayerPrefs.GetString($KEY)
+    note: |
+      ## Remediation
+      Validate or restrict URLs before passing them to Application.OpenURL.

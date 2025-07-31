@@ -1,0 +1,29 @@
+rules:
+  - id: aspnet-core-insecure-deserialization
+    message: |
+      BinaryFormatter deserialization of user input can lead to RCE or data tampering.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-502: Deserialization of Untrusted Data"
+      owasp:
+        - "A08:2021 - Software and Data Integrity Failures"
+      category: security
+      technology:
+        - aspnet-core
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - insecure-deserialization
+        - aspnet-core
+        - security
+    patterns:
+      - pattern: BinaryFormatter().Deserialize($STREAM)
+      - metavariable-pattern:
+          metavariable: $STREAM
+          pattern: Request.Body
+    note: |
+      ## Remediation
+      Avoid BinaryFormatter or validate and sanitize serialized data.

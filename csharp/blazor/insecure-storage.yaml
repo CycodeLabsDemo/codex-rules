@@ -1,0 +1,26 @@
+rules:
+  - id: blazor-insecure-storage
+    message: |
+      Storing sensitive data in local storage can lead to data theft.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-922: Insecure Storage of Sensitive Information"
+      owasp:
+        - "M2: Insecure Data Storage"
+      category: security
+      technology:
+        - blazor
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - storage
+        - blazor
+        - security
+    patterns:
+      - pattern: await JS.InvokeVoidAsync("localStorage.setItem", $KEY, $VAL)
+    note: |
+      ## Remediation
+      Avoid storing sensitive data in browser storage or encrypt it securely.

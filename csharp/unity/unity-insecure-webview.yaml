@@ -1,0 +1,37 @@
+rules:
+  - id: unity-insecure-webview
+    message: |
+      WebView configured with user-supplied content or JavaScript evaluation can lead to XSS or phishing attacks.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-749: Exposed Dangerous Method or Function"
+      owasp:
+        - "M7: Client Code Quality"
+      category: security
+      technology:
+        - unity
+        - webview
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - webview
+        - unity
+        - security
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: $WEBVIEW.LoadURL($INPUT)
+              - metavariable-pattern:
+                  metavariable: $INPUT
+                  patterns:
+                    - pattern: PlayerPrefs.GetString($KEY)
+                    - pattern: Request.$SRC[$KEY]
+          - patterns:
+              - pattern: $WEBVIEW.EvaluateJS($SCRIPT)
+              - pattern-not: $WEBVIEW.EvaluateJS("...")
+    note: |
+      ## Remediation
+      Validate URLs before loading and avoid executing untrusted scripts.

@@ -1,0 +1,139 @@
+rules:
+  - id: aspnet-core-sql-injection
+    message: |
+      SQL query constructed with user input detected. This can lead to SQL injection vulnerabilities.
+      String interpolation or concatenation in SQL queries allows attackers to modify the query.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+      owasp:
+        - "A03:2021 - Injection"
+      category: security
+      technology:
+        - aspnet-core
+        - dotnet
+        - entity-framework
+      references:
+        - https://docs.microsoft.com/en-us/aspnet/core/security/
+        - https://docs.microsoft.com/en-us/ef/core/querying/raw-sql
+        - https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html
+      labels:
+        - sql-injection
+        - aspnet-core
+        - security
+    patterns:
+      - pattern-either:
+          # String concatenation in SQL commands
+          - patterns:
+              - pattern-either:
+                  - pattern: new SqlCommand($QUERY + $INPUT, ...)
+                  - pattern: new SqlCommand($"...{$INPUT}...", ...)
+                  - pattern: $CMD.CommandText = $QUERY + $INPUT
+                  - pattern: $CMD.CommandText = $"...{$INPUT}..."
+          # ExecuteSqlRaw with string interpolation
+          - patterns:
+              - pattern-either:
+                  - pattern: $CTX.Database.ExecuteSqlRaw($"...{$INPUT}...")
+                  - pattern: $CTX.Database.ExecuteSqlRaw($QUERY + $INPUT)
+                  - pattern: $CTX.Database.ExecuteSqlRawAsync($"...{$INPUT}...")
+              - pattern-not: $CTX.Database.ExecuteSqlRaw($QUERY, $PARAMS)
+          # FromSqlRaw with user input
+          - patterns:
+              - pattern-either:
+                  - pattern: $CTX.$ENTITY.FromSqlRaw($"...{$INPUT}...")
+                  - pattern: $CTX.$ENTITY.FromSqlRaw($QUERY + $INPUT)
+              - pattern-not: $CTX.$ENTITY.FromSqlRaw($QUERY, $PARAMS)
+          # ADO.NET direct execution
+          - patterns:
+              - pattern-either:
+                  - pattern: $CONN.Execute($"...{$INPUT}...")
+                  - pattern: $CONN.Execute($QUERY + $INPUT)
+                  - pattern: $CONN.Query<$TYPE>($"...{$INPUT}...")
+          # SqlDataAdapter
+          - patterns:
+              - pattern: new SqlDataAdapter($QUERY + $INPUT, ...)
+    note: |
+      ## Remediation
+      
+      1. **Use parameterized queries**:
+         ```csharp
+         // Bad
+         var query = $"SELECT * FROM Users WHERE Id = {userId}";
+         var user = context.Users.FromSqlRaw(query).FirstOrDefault();
+         
+         // Good
+         var user = context.Users
+             .FromSqlInterpolated($"SELECT * FROM Users WHERE Id = {userId}")
+             .FirstOrDefault();
+         
+         // Also good
+         var user = context.Users
+             .FromSqlRaw("SELECT * FROM Users WHERE Id = {0}", userId)
+             .FirstOrDefault();
+         ```
+      
+      2. **Use Entity Framework Core properly**:
+         ```csharp
+         // Bad
+         var name = Request.Query["name"];
+         var users = context.Database
+             .ExecuteSqlRaw($"DELETE FROM Users WHERE Name = '{name}'");
+         
+         // Good - Use LINQ
+         var users = context.Users
+             .Where(u => u.Name == name)
+             .ToList();
+         
+         // Good - Parameterized raw SQL
+         context.Database.ExecuteSqlRaw(
+             "DELETE FROM Users WHERE Name = {0}", name);
+         ```
+      
+      3. **Use SqlParameters for ADO.NET**:
+         ```csharp
+         // Bad
+         using var cmd = new SqlCommand(
+             $"SELECT * FROM Users WHERE Email = '{email}'", connection);
+         
+         // Good
+         using var cmd = new SqlCommand(
+             "SELECT * FROM Users WHERE Email = @Email", connection);
+         cmd.Parameters.AddWithValue("@Email", email);
+         ```
+      
+      4. **Use Dapper with parameters**:
+         ```csharp
+         // Bad
+         var users = connection.Query<User>(
+             $"SELECT * FROM Users WHERE Status = '{status}'");
+         
+         // Good
+         var users = connection.Query<User>(
+             "SELECT * FROM Users WHERE Status = @Status",
+             new { Status = status });
+         ```
+      
+      5. **Validate input for dynamic queries**:
+         ```csharp
+         // When column names must be dynamic
+         var allowedColumns = new[] { "Name", "Email", "CreatedDate" };
+         var sortColumn = Request.Query["sort"];
+         
+         if (!allowedColumns.Contains(sortColumn))
+         {
+             throw new ArgumentException("Invalid sort column");
+         }
+         
+         // Now safe to use
+         var query = $"SELECT * FROM Users ORDER BY {sortColumn}";
+         ```
+      
+      6. **Use stored procedures**:
+         ```csharp
+         using var cmd = new SqlCommand("sp_GetUserById", connection);
+         cmd.CommandType = CommandType.StoredProcedure;
+         cmd.Parameters.AddWithValue("@UserId", userId);
+         ``` 

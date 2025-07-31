@@ -1,0 +1,29 @@
+rules:
+  - id: unity-command-injection-process
+    message: |
+      Process.Start with user-controlled input can lead to command injection.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')"
+      owasp:
+        - "A03:2021 - Injection"
+      category: security
+      technology:
+        - unity
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - command-injection
+        - unity
+        - security
+    patterns:
+      - pattern: Process.Start($CMD)
+      - metavariable-pattern:
+          metavariable: $CMD
+          pattern: Request.$SRC[$KEY]
+    note: |
+      ## Remediation
+      Avoid executing system commands with untrusted input.

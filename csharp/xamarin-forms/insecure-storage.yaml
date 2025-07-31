@@ -1,0 +1,26 @@
+rules:
+  - id: xamarin-insecure-storage
+    message: |
+      Storing sensitive data using Preferences can expose it to other apps.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-922: Insecure Storage of Sensitive Information"
+      owasp:
+        - "M2: Insecure Data Storage"
+      category: security
+      technology:
+        - xamarin
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - storage
+        - xamarin
+        - security
+    patterns:
+      - pattern: Preferences.Set($KEY, $VAL)
+    note: |
+      ## Remediation
+      Use secure storage APIs such as Xamarin.Essentials.SecureStorage.

@@ -1,0 +1,26 @@
+rules:
+  - id: aspnet-mvc-path-traversal
+    message: |
+      Reading files using paths from user input can lead to path traversal.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')"
+      owasp:
+        - "A05:2021 - Security Misconfiguration"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - path-traversal
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: System.IO.File.ReadAllText(Request.Query[$PARAM])
+    note: |
+      ## Remediation
+      Validate file paths and restrict access to allowed directories.

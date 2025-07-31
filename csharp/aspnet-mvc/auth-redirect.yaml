@@ -1,0 +1,26 @@
+rules:
+  - id: aspnet-mvc-auth-redirect
+    message: |
+      Redirecting to login pages without return URL validation can enable phishing.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
+      owasp:
+        - "A01:2021 - Broken Access Control"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - open-redirect
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: RedirectToAction("Login", new { returnUrl = Request["next"] })
+    note: |
+      ## Remediation
+      Validate returnUrl against allowed list when redirecting to login pages.

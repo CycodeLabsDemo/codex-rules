@@ -1,0 +1,36 @@
+rules:
+  - id: aspnet-mvc-csrf-missing
+    message: |
+      POST actions should include [ValidateAntiForgeryToken] to prevent CSRF.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-352: Cross-Site Request Forgery (CSRF)"
+      owasp:
+        - "A01:2021 - Broken Access Control"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - csrf
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: |
+          public IActionResult $ACTION(...)
+          {
+            ...
+          }
+      - pattern-not-inside: |
+          [ValidateAntiForgeryToken]
+          public IActionResult $ACTION(...)
+          {
+            ...
+          }
+    note: |
+      ## Remediation
+      Use [ValidateAntiForgeryToken] on state-changing actions.

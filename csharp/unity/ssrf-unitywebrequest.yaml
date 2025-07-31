@@ -1,0 +1,31 @@
+rules:
+  - id: unity-ssrf-unitywebrequest
+    message: |
+      UnityWebRequest using user-supplied URLs can result in SSRF vulnerabilities.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-918: Server-Side Request Forgery (SSRF)"
+      owasp:
+        - "A10:2021 - Server-Side Request Forgery"
+      category: security
+      technology:
+        - unity
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - ssrf
+        - unity
+        - security
+    patterns:
+      - pattern: UnityWebRequest.Get($URL)
+      - metavariable-pattern:
+          metavariable: $URL
+          patterns:
+            - pattern: Request.$SRC[$KEY]
+            - pattern: PlayerPrefs.GetString($KEY)
+    note: |
+      ## Remediation
+      Validate and restrict URLs for UnityWebRequest.

@@ -1,0 +1,26 @@
+rules:
+  - id: xamarin-insecure-http
+    message: |
+      Using http:// URLs exposes traffic to sniffing and MITM on mobile.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-319: Cleartext Transmission of Sensitive Information"
+      owasp:
+        - "M3: Insecure Communication"
+      category: security
+      technology:
+        - xamarin
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - insecure-http
+        - xamarin
+        - security
+    patterns:
+      - pattern-regex: '"http://'
+    note: |
+      ## Remediation
+      Use HTTPS for all network communication.

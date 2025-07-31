@@ -1,0 +1,43 @@
+rules:
+  - id: dotnet-maui-cert-validation-bypass
+    message: |
+      SSL certificate validation disabled. Accepting any certificate allows man-in-the-middle attacks.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-295: Improper Certificate Validation"
+      owasp:
+        - "M3: Insecure Communication"
+      category: security
+      technology:
+        - dotnet-maui
+      references:
+        - https://learn.microsoft.com/dotnet/maui
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - certificate-validation
+        - dotnet-maui
+        - security
+    patterns:
+      - pattern-either:
+          - pattern: new HttpClientHandler { ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator }
+          - pattern: |
+              $HANDLER.ServerCertificateCustomValidationCallback = (sender, $CERT, $CHAIN, $ERRORS) => true
+    note: |
+      ## Remediation
+
+      1. **Remove callbacks that blindly accept certificates**:
+         ```csharp
+         var handler = new HttpClientHandler();
+         var client = new HttpClient(handler);
+         ```
+
+      2. **If custom validation is required, perform strict checks**:
+         ```csharp
+         handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, errors) =>
+         {
+             return errors == SslPolicyErrors.None && cert.Issuer == "CN=trusted";
+         };
+         ```

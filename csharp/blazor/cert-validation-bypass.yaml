@@ -1,0 +1,26 @@
+rules:
+  - id: blazor-cert-validation-bypass
+    message: |
+      Accepting all certificates disables SSL validation and is insecure.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-295: Improper Certificate Validation"
+      owasp:
+        - "M3: Insecure Communication"
+      category: security
+      technology:
+        - blazor
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - certificate-validation
+        - blazor
+        - security
+    patterns:
+      - pattern: HttpClientHandler.ServerCertificateCustomValidationCallback += (sender, cert, chain, errors) => true
+    note: |
+      ## Remediation
+      Remove callbacks that bypass certificate validation.

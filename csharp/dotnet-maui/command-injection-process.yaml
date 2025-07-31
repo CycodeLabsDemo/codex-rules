@@ -1,0 +1,31 @@
+rules:
+  - id: dotnet-maui-command-injection-process
+    message: |
+      Process.Start with user input can allow command injection.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')"
+      owasp:
+        - "A03:2021 - Injection"
+      category: security
+      technology:
+        - dotnet-maui
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - command-injection
+        - dotnet-maui
+        - security
+    patterns:
+      - pattern-either:
+          - pattern: Process.Start($CMD)
+          - pattern: System.Diagnostics.Process.Start($CMD)
+      - metavariable-pattern:
+          metavariable: $CMD
+          pattern: Request.$SRC[$KEY]
+    note: |
+      ## Remediation
+      Avoid executing commands with untrusted input.

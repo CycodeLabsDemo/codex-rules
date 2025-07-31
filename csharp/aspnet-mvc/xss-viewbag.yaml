@@ -1,0 +1,26 @@
+rules:
+  - id: aspnet-mvc-xss-viewbag
+    message: |
+      Outputting ViewBag data without encoding can lead to XSS.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+      owasp:
+        - "A03:2021 - Injection"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - xss
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: "@Html.Raw(ViewBag.$PROP)"
+    note: |
+      ## Remediation
+      Use Html.Encode when rendering content from ViewBag.

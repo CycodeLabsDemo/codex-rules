@@ -1,0 +1,32 @@
+rules:
+  - id: blazor-ssrf-httpclient
+    message: |
+      User-controlled URL used in HttpClient request can lead to SSRF in Blazor applications.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-918: Server-Side Request Forgery (SSRF)"
+      owasp:
+        - "A10:2021 - Server-Side Request Forgery"
+      category: security
+      technology:
+        - blazor
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - ssrf
+        - blazor
+        - security
+    patterns:
+      - pattern-either:
+          - pattern: HttpClient().GetAsync($URL)
+          - pattern: new HttpClient().GetAsync($URL)
+      - metavariable-pattern:
+          metavariable: $URL
+          patterns:
+            - pattern: $_NAV.ToAbsoluteUri($INPUT).ToString()
+    note: |
+      ## Remediation
+      Validate and whitelist URLs before making HTTP requests.

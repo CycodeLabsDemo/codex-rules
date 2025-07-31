@@ -1,0 +1,29 @@
+rules:
+  - id: xamarin-sql-injection
+    message: |
+      Building SQL commands using string concatenation can result in SQL injection.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+      owasp:
+        - "A03:2021 - Injection"
+      category: security
+      technology:
+        - xamarin
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - sql-injection
+        - xamarin
+        - security
+    patterns:
+      - pattern: $CONN.CreateCommand().CommandText = $QUERY
+      - metavariable-pattern:
+          metavariable: $QUERY
+          pattern: $ANY + $USERINPUT
+    note: |
+      ## Remediation
+      Use parameterized queries or ORM features instead of string concatenation.

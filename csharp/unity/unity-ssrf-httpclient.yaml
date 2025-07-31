@@ -1,0 +1,29 @@
+rules:
+  - id: unity-ssrf-httpclient
+    message: |
+      Using HttpClient with user-supplied URLs can allow server-side request forgery.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-918: Server-Side Request Forgery (SSRF)"
+      owasp:
+        - "A10:2021 - Server-Side Request Forgery"
+      category: security
+      technology:
+        - unity
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - ssrf
+        - unity
+        - security
+    patterns:
+      - pattern: HttpClient().GetAsync($URL)
+      - metavariable-pattern:
+          metavariable: $URL
+          pattern: Request.$SRC[$KEY]
+    note: |
+      ## Remediation
+      Validate or restrict URLs before making HTTP requests.

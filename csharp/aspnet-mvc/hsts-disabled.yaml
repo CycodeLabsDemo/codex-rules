@@ -1,0 +1,31 @@
+rules:
+  - id: aspnet-mvc-hsts-disabled
+    message: |
+      Missing HSTS header reduces protection against downgrade attacks.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-614: Sensitive Cookie in HTTPS Session Without 'Secure' Attribute"
+      owasp:
+        - "A06:2021 - Vulnerable and Outdated Components"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - headers
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: app.UseHsts();
+      - pattern-not-inside: |
+          if (env.IsDevelopment())
+          {
+              ...
+          }
+    note: |
+      ## Remediation
+      Enable HSTS in production to enforce HTTPS.

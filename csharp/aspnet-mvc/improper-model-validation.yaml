@@ -1,0 +1,31 @@
+rules:
+  - id: aspnet-mvc-improper-model-validation
+    message: |
+      Actions that modify data should verify ModelState.IsValid.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-20: Improper Input Validation"
+      owasp:
+        - "A01:2021 - Broken Access Control"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - validation
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: |
+          public IActionResult $ACTION($MODEL model)
+          {
+            ...
+            SaveChanges(model);
+          }
+    note: |
+      ## Remediation
+      Check `ModelState.IsValid` before processing user input.

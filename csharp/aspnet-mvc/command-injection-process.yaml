@@ -1,0 +1,26 @@
+rules:
+  - id: aspnet-mvc-command-injection-process
+    message: |
+      Process.Start with user input can allow command injection.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')"
+      owasp:
+        - "A03:2021 - Injection"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - command-injection
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: Process.Start($INPUT)
+    note: |
+      ## Remediation
+      Avoid executing shell commands with user input or use parameterized APIs.

@@ -1,0 +1,26 @@
+rules:
+  - id: xamarin-insecure-cors
+    message: |
+      Allowing any origin in CORS configuration can expose APIs to untrusted domains.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-942: Permissive Cross-domain Policy with Untrusted Domains"
+      owasp:
+        - "API8:2019 - Injection"
+      category: security
+      technology:
+        - xamarin
+      references:
+        - https://owasp.org/www-project-api-security/
+      labels:
+        - insecure-cors
+        - xamarin
+        - security
+    patterns:
+      - pattern: builder.AllowAnyOrigin()
+    note: |
+      ## Remediation
+      Set specific origins in your CORS policy configuration.

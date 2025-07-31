@@ -1,0 +1,26 @@
+rules:
+  - id: xamarin-insecure-deserialization
+    message: |
+      Deserializing untrusted data using BinaryFormatter can lead to RCE.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-502: Deserialization of Untrusted Data"
+      owasp:
+        - "A08:2021 - Software and Data Integrity Failures"
+      category: security
+      technology:
+        - xamarin
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - insecure-deserialization
+        - xamarin
+        - security
+    patterns:
+      - pattern: new BinaryFormatter().Deserialize($STREAM)
+    note: |
+      ## Remediation
+      Avoid BinaryFormatter or validate deserialized data carefully.

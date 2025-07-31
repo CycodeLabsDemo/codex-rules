@@ -1,0 +1,26 @@
+rules:
+  - id: aspnet-mvc-insecure-cookie
+    message: |
+      Cookies without Secure or HttpOnly flags may be intercepted or accessed by scripts.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-614: Sensitive Cookie in HTTPS Session Without 'Secure' Attribute"
+      owasp:
+        - "A02:2021 - Cryptographic Failures"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - cookie
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: Response.Cookies.Append($NAME, $VAL)
+    note: |
+      ## Remediation
+      Set Secure and HttpOnly on cookies containing sensitive information.

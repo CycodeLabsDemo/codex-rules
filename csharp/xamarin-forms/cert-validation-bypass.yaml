@@ -1,0 +1,26 @@
+rules:
+  - id: xamarin-cert-validation-bypass
+    message: |
+      Accepting all SSL certificates can lead to MITM attacks.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-295: Improper Certificate Validation"
+      owasp:
+        - "M3: Insecure Communication"
+      category: security
+      technology:
+        - xamarin
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - certificate-validation
+        - xamarin
+        - security
+    patterns:
+      - pattern: ServicePointManager.ServerCertificateValidationCallback += delegate { return true; }
+    note: |
+      ## Remediation
+      Remove certificate validation overrides or perform strict checks.

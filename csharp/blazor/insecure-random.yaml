@@ -1,0 +1,26 @@
+rules:
+  - id: blazor-insecure-random
+    message: |
+      Using System.Random for security sensitive values is insecure.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-338: Use of Cryptographically Weak PRNG"
+      owasp:
+        - "A02:2021 - Cryptographic Failures"
+      category: security
+      technology:
+        - blazor
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - randomness
+        - blazor
+        - security
+    patterns:
+      - pattern: new Random()
+    note: |
+      ## Remediation
+      Use RandomNumberGenerator.Create() for cryptographic random values.

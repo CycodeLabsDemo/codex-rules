@@ -1,0 +1,26 @@
+rules:
+  - id: blazor-insecure-cookie
+    message: |
+      Cookies without Secure and SameSite settings may lead to session hijacking.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-614: Sensitive Cookie in HTTPS Session Without 'Secure' Attribute"
+      owasp:
+        - "A02:2021 - Cryptographic Failures"
+      category: security
+      technology:
+        - blazor
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - cookie
+        - blazor
+        - security
+    patterns:
+      - pattern: builder.Services.AddHttpContextAccessor()
+    note: |
+      ## Remediation
+      Set Secure and SameSite attributes on cookies.

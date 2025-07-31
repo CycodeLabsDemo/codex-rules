@@ -1,0 +1,26 @@
+rules:
+  - id: aspnetcore-open-redirect
+    message: |
+      Redirecting using request parameters without validation can cause open redirect vulnerabilities.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
+      owasp:
+        - "A01:2021 - Broken Access Control"
+      category: security
+      technology:
+        - aspnet-core
+      references:
+        - https://owasp.org/www-community/attacks/URL_Redirection
+      labels:
+        - open-redirect
+        - aspnet-core
+        - security
+    patterns:
+      - pattern: Redirect(Request.Query[$PARAM])
+    note: |
+      ## Remediation
+      Validate redirect destinations before using `Redirect`.

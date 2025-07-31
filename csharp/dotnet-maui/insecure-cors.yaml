@@ -1,0 +1,26 @@
+rules:
+  - id: dotnet-maui-insecure-cors
+    message: |
+      Allowing any origin in CORS configuration is insecure for API calls.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-942: Permissive Cross-domain Policy with Untrusted Domains"
+      owasp:
+        - "A05:2021 - Security Misconfiguration"
+      category: security
+      technology:
+        - dotnet-maui
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - cors
+        - dotnet-maui
+        - security
+    patterns:
+      - pattern: builder.WithOrigins("*")
+    note: |
+      ## Remediation
+      Restrict CORS origins to trusted domains.

@@ -1,0 +1,26 @@
+rules:
+  - id: aspnet-mvc-sql-injection-raw-string
+    message: |
+      SQL query constructed from user input can lead to SQL injection.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+      owasp:
+        - "A03:2021 - Injection"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - sql-injection
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: SqlCommand($QUERY + $INPUT)
+    note: |
+      ## Remediation
+      Use parameterized queries or ORM methods instead of string concatenation.

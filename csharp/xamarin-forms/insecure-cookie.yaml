@@ -1,0 +1,26 @@
+rules:
+  - id: xamarin-insecure-cookie
+    message: |
+      Cookies without Secure and HttpOnly flags are vulnerable to theft.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-614: Sensitive Cookie in HTTPS Session Without 'Secure' Attribute"
+      owasp:
+        - "A02:2021 - Cryptographic Failures"
+      category: security
+      technology:
+        - xamarin
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - insecure-cookie
+        - xamarin
+        - security
+    patterns:
+      - pattern: new Cookie($NAME, $VALUE)
+    note: |
+      ## Remediation
+      Use Secure and HttpOnly attributes on cookies.

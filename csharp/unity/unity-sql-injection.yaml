@@ -1,0 +1,31 @@
+rules:
+  - id: unity-sql-injection
+    message: |
+      Building SQL commands using string concatenation can result in SQL injection.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+      owasp:
+        - "A03:2021 - Injection"
+      category: security
+      technology:
+        - unity
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - sql-injection
+        - unity
+        - security
+    patterns:
+      - pattern: $CONN.CreateCommand().CommandText = $QUERY
+      - metavariable-pattern:
+          metavariable: $QUERY
+          patterns:
+            - pattern: $ANY + $USERINPUT
+            - pattern: string.Format($FMT, $USERINPUT)
+    note: |
+      ## Remediation
+      Use parameterized queries or ORM features instead of string concatenation.

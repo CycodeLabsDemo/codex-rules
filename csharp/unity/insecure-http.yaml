@@ -1,0 +1,31 @@
+rules:
+  - id: unity-insecure-http
+    message: |
+      Using UnityWebRequest or WWW with HTTP exposes communication to eavesdropping.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-319: Cleartext Transmission of Sensitive Information"
+      owasp:
+        - "M3: Insecure Communication"
+      category: security
+      technology:
+        - unity
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - insecure-http
+        - unity
+        - security
+    patterns:
+      - pattern-either:
+          - pattern: UnityWebRequest.Get($URL)
+          - pattern: new WWW($URL)
+      - metavariable-pattern:
+          metavariable: $URL
+          pattern: "http://..."
+    note: |
+      ## Remediation
+      Use HTTPS for network requests or enforce secure connections.

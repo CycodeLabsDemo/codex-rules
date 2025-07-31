@@ -1,0 +1,26 @@
+rules:
+  - id: aspnetcore-insecure-cookie
+    message: |
+      Cookies created without Secure or HttpOnly attributes can be intercepted or accessed by client-side scripts.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-614: Sensitive Cookie Without 'Secure' Attribute"
+      owasp:
+        - "A02:2021 - Cryptographic Failures"
+      category: security
+      technology:
+        - aspnet-core
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - cookies
+        - aspnet-core
+        - security
+    patterns:
+      - pattern: $RESP.Cookies.Append($NAME, $VAL)
+    note: |
+      ## Remediation
+      Use `CookieOptions` with `Secure` and `HttpOnly` set to true when setting cookies.

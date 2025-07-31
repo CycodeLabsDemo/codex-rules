@@ -1,0 +1,30 @@
+rules:
+  - id: aspnet-mvc-ssrf-httpclient
+    message: |
+      User-controlled URL used in HttpClient request can lead to SSRF.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-918: Server-Side Request Forgery (SSRF)"
+      owasp:
+        - "A10:2021 - Server-Side Request Forgery"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - ssrf
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: HttpClient().GetAsync($URL)
+      - metavariable-pattern:
+          metavariable: $URL
+          patterns:
+            - pattern: Request.Query[$PARAM]
+    note: |
+      ## Remediation
+      Validate and whitelist URLs before making outbound requests.

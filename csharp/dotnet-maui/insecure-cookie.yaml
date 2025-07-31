@@ -1,0 +1,26 @@
+rules:
+  - id: dotnet-maui-insecure-cookie
+    message: |
+      Cookies without Secure or HttpOnly flags may be stolen.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-614: Sensitive Cookie in HTTPS Session Without 'Secure' Attribute"
+      owasp:
+        - "A02:2021 - Cryptographic Failures"
+      category: security
+      technology:
+        - dotnet-maui
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - cookie
+        - dotnet-maui
+        - security
+    patterns:
+      - pattern: Preferences.Set("cookie", $VAL)
+    note: |
+      ## Remediation
+      Set Secure and HttpOnly flags on cookies.

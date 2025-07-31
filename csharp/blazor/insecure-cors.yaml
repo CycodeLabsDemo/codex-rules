@@ -1,0 +1,26 @@
+rules:
+  - id: blazor-insecure-cors
+    message: |
+      Allowing any origin in CORS configuration is insecure.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-942: Permissive Cross-domain Policy with Untrusted Domains"
+      owasp:
+        - "A05:2021 - Security Misconfiguration"
+      category: security
+      technology:
+        - blazor
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - cors
+        - blazor
+        - security
+    patterns:
+      - pattern: builder.WithOrigins("*")
+    note: |
+      ## Remediation
+      Specify allowed origins explicitly in CORS settings.

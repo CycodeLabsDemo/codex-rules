@@ -1,0 +1,30 @@
+rules:
+  - id: blazor-log-injection
+    message: |
+      Logging unsanitized data may lead to log injection.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-117: Improper Output Neutralization for Logs"
+      owasp:
+        - "A03:2021 - Injection"
+      category: security
+      technology:
+        - blazor
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - logging
+        - blazor
+        - security
+    patterns:
+      - pattern: logger.LogInformation($MSG)
+      - metavariable-pattern:
+          metavariable: $MSG
+          patterns:
+            - pattern: context.Request.Query[$PARAM]
+    note: |
+      ## Remediation
+      Sanitize log data or use structured logging.

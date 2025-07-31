@@ -1,0 +1,31 @@
+rules:
+  - id: dotnet-maui-path-traversal
+    message: |
+      Using user input in file paths can lead to path traversal attacks.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')"
+      owasp:
+        - "A05:2021 - Security Misconfiguration"
+      category: security
+      technology:
+        - dotnet-maui
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - path-traversal
+        - dotnet-maui
+        - security
+    patterns:
+      - pattern-either:
+          - pattern: File.ReadAllText($PATH)
+          - pattern: File.WriteAllText($PATH, ...)
+      - metavariable-pattern:
+          metavariable: $PATH
+          pattern: Request.$SRC[$KEY]
+    note: |
+      ## Remediation
+      Validate and sanitize file paths before accessing the filesystem.

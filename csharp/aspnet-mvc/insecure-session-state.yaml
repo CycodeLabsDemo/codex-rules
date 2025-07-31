@@ -1,0 +1,26 @@
+rules:
+  - id: aspnet-mvc-insecure-session-state
+    message: |
+      Exposing session identifiers in URLs can lead to session fixation attacks.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-384: Session Fixation"
+      owasp:
+        - "A01:2021 - Broken Access Control"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - session
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: Response.Redirect("/home?session=" + Session.SessionID)
+    note: |
+      ## Remediation
+      Avoid including session IDs in URLs; use cookies or headers instead.

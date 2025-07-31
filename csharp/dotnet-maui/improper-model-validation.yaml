@@ -1,0 +1,31 @@
+rules:
+  - id: dotnet-maui-improper-model-validation
+    message: |
+      ViewModel data should be validated before submission.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-20: Improper Input Validation"
+      owasp:
+        - "A01:2021 - Broken Access Control"
+      category: security
+      technology:
+        - dotnet-maui
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - validation
+        - dotnet-maui
+        - security
+    patterns:
+      - pattern: await SubmitAsync($MODEL)
+      - pattern-not-inside: |
+          if(!$MODEL.IsValid)
+          {
+              ...
+          }
+    note: |
+      ## Remediation
+      Validate model properties before sending them to the server.

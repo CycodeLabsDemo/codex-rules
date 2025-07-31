@@ -1,0 +1,26 @@
+rules:
+  - id: aspnet-mvc-insecure-upload
+    message: |
+      Saving uploaded files without validation can lead to arbitrary file upload vulnerabilities.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-434: Unrestricted Upload of File with Dangerous Type"
+      owasp:
+        - "A05:2021 - Security Misconfiguration"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - file-upload
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: file.SaveAs(Path.Combine($DIR, file.FileName))
+    note: |
+      ## Remediation
+      Validate file type and store uploads outside the web root.

@@ -1,0 +1,26 @@
+rules:
+  - id: aspnet-mvc-insecure-random
+    message: |
+      System.Random is not cryptographically secure for token generation.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-338: Use of Cryptographically Weak PRNG"
+      owasp:
+        - "A02:2021 - Cryptographic Failures"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - randomness
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: new Random()
+    note: |
+      ## Remediation
+      Use RNGCryptoServiceProvider or RandomNumberGenerator.

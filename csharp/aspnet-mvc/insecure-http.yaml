@@ -1,0 +1,26 @@
+rules:
+  - id: aspnet-mvc-insecure-http
+    message: |
+      Using insecure HTTP protocol exposes data to interception.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-319: Cleartext Transmission of Sensitive Information"
+      owasp:
+        - "M3: Insecure Communication"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - insecure-http
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern-regex: "\"http://"
+    note: |
+      ## Remediation
+      Use HTTPS for all network communication.

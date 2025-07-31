@@ -1,0 +1,26 @@
+rules:
+  - id: aspnet-core-insecure-cors
+    message: |
+      Allowing any origin in CORS policy exposes APIs to cross-origin attacks.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-942: Permissive Cross-domain Policy with Untrusted Domains"
+      owasp:
+        - "API8:2019 - Injection"
+      category: security
+      technology:
+        - aspnet-core
+      references:
+        - https://owasp.org/www-project-api-security/
+      labels:
+        - insecure-cors
+        - aspnet-core
+        - security
+    patterns:
+      - pattern: builder.AllowAnyOrigin()
+    note: |
+      ## Remediation
+      Specify allowed origins explicitly in CORS policy.

@@ -1,0 +1,28 @@
+rules:
+  - id: unity-insecure-random
+    message: |
+      UnityEngine.Random should not be used for security-sensitive values.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-338: Use of Cryptographically Weak PRNG"
+      owasp:
+        - "A02:2021 - Cryptographic Failures"
+      category: security
+      technology:
+        - unity
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - weak-random
+        - unity
+        - security
+    patterns:
+      - pattern-either:
+          - pattern: UnityEngine.Random.Range($A, $B)
+          - pattern: Random.Range($A, $B)
+    note: |
+      ## Remediation
+      Use System.Security.Cryptography.RandomNumberGenerator for security-related randomness.

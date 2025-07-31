@@ -1,0 +1,26 @@
+rules:
+  - id: aspnet-mvc-insecure-tls-version
+    message: |
+      Using outdated TLS versions weakens communication security.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-326: Inadequate Encryption Strength"
+      owasp:
+        - "M3: Insecure Communication"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - tls
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3
+    note: |
+      ## Remediation
+      Use TLS 1.2 or higher for secure communication.

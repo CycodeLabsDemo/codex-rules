@@ -1,0 +1,26 @@
+rules:
+  - id: aspnet-mvc-insecure-deserialization
+    message: |
+      BinaryFormatter.Deserialize with user input can lead to remote code execution.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-502: Deserialization of Untrusted Data"
+      owasp:
+        - "A08:2021 - Software and Data Integrity Failures"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - deserialization
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: new BinaryFormatter().Deserialize($STREAM)
+    note: |
+      ## Remediation
+      Avoid BinaryFormatter or validate and sanitize serialized data.

@@ -1,0 +1,26 @@
+rules:
+  - id: dotnet-maui-insecure-storage
+    message: |
+      Storing data using Preferences can leak sensitive info on mobile devices.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-922: Insecure Storage of Sensitive Information"
+      owasp:
+        - "M2: Insecure Data Storage"
+      category: security
+      technology:
+        - dotnet-maui
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - storage
+        - dotnet-maui
+        - security
+    patterns:
+      - pattern: Preferences.Set($KEY, $VAL)
+    note: |
+      ## Remediation
+      Use SecureStorage for storing sensitive data.

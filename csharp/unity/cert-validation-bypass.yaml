@@ -1,0 +1,33 @@
+rules:
+  - id: unity-cert-validation-bypass
+    message: |
+      Overriding CertificateHandler to accept all certificates disables SSL validation.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-295: Improper Certificate Validation"
+      owasp:
+        - "M3: Insecure Communication"
+      category: security
+      technology:
+        - unity
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - ssl-bypass
+        - unity
+        - security
+    patterns:
+      - pattern: |
+          class $C : CertificateHandler
+          {
+            protected override bool ValidateCertificate(byte[] $CERT)
+            {
+              return true;
+            }
+          }
+    note: |
+      ## Remediation
+      Avoid overriding certificate validation or implement proper checks.

@@ -1,0 +1,26 @@
+rules:
+  - id: aspnet-mvc-unvalidated-redirect
+    message: |
+      Using Redirect without validating the returnUrl parameter can lead to open redirect.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
+      owasp:
+        - "A01:2021 - Broken Access Control"
+      category: security
+      technology:
+        - aspnet-mvc
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - open-redirect
+        - aspnet-mvc
+        - security
+    patterns:
+      - pattern: Redirect(Request["returnUrl"])
+    note: |
+      ## Remediation
+      Validate the return URL before redirecting.

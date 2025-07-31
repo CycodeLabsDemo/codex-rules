@@ -1,0 +1,28 @@
+rules:
+  - id: xamarin-ssrf-httpclient
+    message: |
+      Using user input in HttpClient requests can cause SSRF vulnerabilities.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-918: Server-Side Request Forgery (SSRF)"
+      owasp:
+        - "A10:2021 - Server-Side Request Forgery"
+      category: security
+      technology:
+        - xamarin
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - ssrf
+        - xamarin
+        - security
+    patterns:
+      - pattern-either:
+          - pattern: HttpClient().GetAsync($URL)
+          - pattern: new HttpClient().GetAsync($URL)
+    note: |
+      ## Remediation
+      Validate and whitelist URLs used for HTTP requests.

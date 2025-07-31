@@ -1,0 +1,32 @@
+rules:
+  - id: aspnetcore-xss
+    message: |
+      Rendering raw user input with Html.Raw or HtmlString can introduce Cross-Site Scripting (XSS) vulnerabilities.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+      owasp:
+        - "A03:2021 - Injection"
+      category: security
+      technology:
+        - aspnetcore
+        - razor
+      references:
+        - https://learn.microsoft.com/en-us/aspnet/core/security/cross-site-scripting
+      labels:
+        - xss
+        - aspnetcore
+        - security
+    patterns:
+      - pattern-either:
+          - pattern: Html.Raw(Request.$SRC[$KEY])
+          - pattern: new HtmlString(Request.$SRC[$KEY])
+      - metavariable-regex:
+          metavariable: $SRC
+          regex: "^(Query|Form)$"
+    note: |
+      ## Remediation
+      Avoid rendering raw user input. Use automatic HTML encoding or sanitize the input before display.

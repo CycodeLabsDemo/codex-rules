@@ -1,0 +1,26 @@
+rules:
+  - id: dotnet-maui-open-redirect
+    message: |
+      Using Shell.NavigateTo with user-controlled URLs can lead to open redirect.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
+      owasp:
+        - "A01:2021 - Broken Access Control"
+      category: security
+      technology:
+        - dotnet-maui
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - open-redirect
+        - dotnet-maui
+        - security
+    patterns:
+      - pattern: Shell.Current.GoToAsync($URL)
+    note: |
+      ## Remediation
+      Validate or restrict URLs passed to Shell navigation.

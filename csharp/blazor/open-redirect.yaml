@@ -1,0 +1,30 @@
+rules:
+  - id: blazor-open-redirect
+    message: |
+      NavigationManager.NavigateTo with unvalidated input can cause open redirects.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
+      owasp:
+        - "A01:2021 - Broken Access Control"
+      category: security
+      technology:
+        - blazor
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - open-redirect
+        - blazor
+        - security
+    patterns:
+      - pattern: $_NAV.NavigateTo($URL)
+      - metavariable-pattern:
+          metavariable: $URL
+          patterns:
+            - pattern: $CTX.Request.Query[$PARAM]
+    note: |
+      ## Remediation
+      Validate destinations before using NavigateTo.
