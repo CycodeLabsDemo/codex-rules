@@ -23,9 +23,9 @@ rules:
       - pattern-either:
           - pattern: UnityWebRequest.Get($URL)
           - pattern: new WWW($URL)
-      - metavariable-pattern:
+      - metavariable-regex:
           metavariable: $URL
-          pattern: "http://..."
+          regex: '^"http://'
     note: |
       ## Remediation
       Use HTTPS for network requests or enforce secure connections.

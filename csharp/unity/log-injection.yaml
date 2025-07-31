@@ -20,10 +20,14 @@ rules:
         - unity
         - security
     patterns:
-      - pattern: Debug.Log($MSG)
+      - pattern-either:
+          - pattern: Debug.Log($MSG)
+          - pattern: UnityEngine.Debug.Log($MSG)
       - metavariable-pattern:
           metavariable: $MSG
-          pattern: Request.$SRC[$KEY]
+          pattern-either:
+            - pattern: Request.$SRC[$KEY]
+            - pattern: Request[$KEY]
     note: |
       ## Remediation
       Sanitize log messages or avoid logging untrusted user input.

@@ -21,9 +21,9 @@ rules:
         - security
     patterns:
       - pattern-either:
-          - pattern: PlayerPrefs.SetString($KEY, $DATA)
-          - pattern: PlayerPrefs.SetInt($KEY, $DATA)
-          - pattern: PlayerPrefs.SetFloat($KEY, $DATA)
+          - pattern: UnityEngine.PlayerPrefs.SetString($KEY, $DATA)
+          - pattern: UnityEngine.PlayerPrefs.SetInt($KEY, $DATA)
+          - pattern: UnityEngine.PlayerPrefs.SetFloat($KEY, $DATA)
     note: |
       ## Remediation
       Avoid storing sensitive data in PlayerPrefs or encrypt values before storage.

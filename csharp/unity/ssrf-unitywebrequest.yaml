@@ -23,7 +23,7 @@ rules:
       - pattern: UnityWebRequest.Get($URL)
       - metavariable-pattern:
           metavariable: $URL
-          patterns:
+          pattern-either:
             - pattern: Request.$SRC[$KEY]
             - pattern: PlayerPrefs.GetString($KEY)
     note: |

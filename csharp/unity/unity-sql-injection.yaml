@@ -23,7 +23,7 @@ rules:
       - pattern: $CONN.CreateCommand().CommandText = $QUERY
       - metavariable-pattern:
           metavariable: $QUERY
-          patterns:
+          pattern-either:
             - pattern: $ANY + $USERINPUT
             - pattern: string.Format($FMT, $USERINPUT)
     note: |

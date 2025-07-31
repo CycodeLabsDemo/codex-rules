@@ -1,4 +1,4 @@
 using UnityEngine.Networking;
-public class Test { public void Foo() { var input = "http://example";
+public class Test { public void Foo() {
         // ruleid: unity-ssrf-unitywebrequest
-        UnityWebRequest.Get(input); } }
+        UnityWebRequest.Get(Request.Query["u"]); } }

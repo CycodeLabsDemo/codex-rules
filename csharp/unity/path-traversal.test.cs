@@ -1,4 +1,4 @@
 using System.IO;
-public class Test { public void Foo() { var input = "../../secret";
+public class Test { public void Foo() {
         // ruleid: unity-path-traversal
-        File.ReadAllText(input); } }
+        File.ReadAllText(Request.Query["file"]); } }

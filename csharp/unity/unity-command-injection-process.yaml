@@ -20,10 +20,14 @@ rules:
         - unity
         - security
     patterns:
-      - pattern: Process.Start($CMD)
+      - pattern-either:
+          - pattern: Process.Start($CMD)
+          - pattern: System.Diagnostics.Process.Start($CMD)
       - metavariable-pattern:
           metavariable: $CMD
-          pattern: Request.$SRC[$KEY]
+          pattern-either:
+            - pattern: Request.$SRC[$KEY]
+            - pattern: Request[$KEY]
     note: |
       ## Remediation
       Avoid executing system commands with untrusted input.

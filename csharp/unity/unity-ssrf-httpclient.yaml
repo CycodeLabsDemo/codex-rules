@@ -20,7 +20,7 @@ rules:
         - unity
         - security
     patterns:
-      - pattern: HttpClient().GetAsync($URL)
+      - pattern: new HttpClient().GetAsync($URL)
       - metavariable-pattern:
           metavariable: $URL
           pattern: Request.$SRC[$KEY]
