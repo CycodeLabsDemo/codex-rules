@@ -29,18 +29,13 @@ rules:
               - pattern: UnityEngine.Random.insideUnitSphere
               - pattern: Random.insideUnitSphere
           - pattern-inside: |
-              class $CLASS
+              $METHOD($PARAMS)
               {
-                ...
-                $METHOD($PARAMS)
-                {
-                  ...
-                }
                 ...
               }
           - metavariable-regex:
               metavariable: $METHOD
-              regex: (?i).*(token|key|password|secret|salt|nonce|session|auth|crypto).*
+              regex: ".*[Tt]oken.*|.*[Kk]ey.*|.*[Pp]assword.*|.*[Ss]ecret.*|.*[Aa]uth.*"
     note: |
       ## Remediation
       Use System.Security.Cryptography.RandomNumberGenerator for security-related randomness.

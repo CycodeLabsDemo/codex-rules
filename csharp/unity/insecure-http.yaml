@@ -29,19 +29,9 @@ rules:
               - pattern: new WWW($URL)
               - pattern: new WWW($URL, $DATA)
               - pattern: UnityWebRequest.SendWebRequest($URL)
-          - pattern-either:
-              # Hardcoded HTTP URLs
-              - metavariable-regex:
-                  metavariable: $URL
-                  regex: '^"http://[^"]*"$'
-              # Dynamic URLs with HTTP
-              - patterns:
-                  - metavariable-pattern:
-                      metavariable: $URL
-                      pattern-either:
-                        - pattern: $BASEURL + $PATH
-                        - pattern: $"http://{$HOST}..."
-                        - pattern: string.Format("http://{0}", $HOST)
+          - metavariable-regex:
+              metavariable: $URL
+              regex: '^"http://'
           - pattern-not-inside: |
               if ($URL.StartsWith("https://")) { ... }
     note: |

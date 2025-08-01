@@ -22,12 +22,9 @@ rules:
     patterns:
       - patterns:
           - pattern-either:
-              # EditForm without validation attributes
-              - pattern-regex: '<EditForm\s+Model="@.*"\s+OnValidSubmit=".*"[^>]*>'
-              - pattern-regex: '<EditForm\s+OnValidSubmit=".*"\s+Model="@.*"[^>]*>'
-          - pattern-not-regex: '.*OnInvalidSubmit.*'
-          - pattern-not-regex: '.*DataAnnotationsValidator.*'
-          - pattern-not-regex: '.*ValidationSummary.*'
+              # EditForm without validation - simplified patterns
+              - pattern: <EditForm Model="@$MODEL" OnValidSubmit="$HANDLER" />
+              - pattern: <EditForm OnValidSubmit="$HANDLER" Model="@$MODEL" />
           - pattern-not-inside: |
               <EditForm Model="@$MODEL" OnValidSubmit="$HANDLER">
                 <DataAnnotationsValidator />
