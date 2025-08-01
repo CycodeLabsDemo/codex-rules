@@ -1,0 +1,52 @@
+rules:
+  - id: aspnet-core-missing-authorization
+    message: |
+      Controller actions without authorization attributes may allow unauthorized access.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-862: Missing Authorization"
+      owasp:
+        - "A01:2021 - Broken Access Control"
+      category: security
+      technology:
+        - aspnet-core
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - authorization
+        - aspnet-core
+        - security
+    patterns:
+      - patterns:
+          - pattern-either:
+              - pattern: |
+                  public IActionResult $ACTION(...)
+                  {
+                    ...
+                  }
+              - pattern: |
+                  public async Task<IActionResult> $ACTION(...)
+                  {
+                    ...
+                  }
+          - pattern-not-inside: |
+              [Authorize]
+              ...
+          - pattern-not-inside: |
+              [AllowAnonymous]
+              ...
+          - pattern-not-inside: |
+              [HttpGet]
+              public IActionResult Index()
+              {
+                ...
+              }
+          - metavariable-regex:
+              metavariable: $ACTION
+              regex: ".*[Cc]reate.*|.*[Ee]dit.*|.*[Dd]elete.*|.*[Aa]dmin.*|.*[Uu]pdate.*"
+    note: |
+      ## Remediation
+      Add [Authorize] attribute to sensitive actions or use [AllowAnonymous] explicitly for public endpoints.

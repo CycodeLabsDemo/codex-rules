@@ -20,7 +20,17 @@ rules:
         - aspnet-core
         - security
     patterns:
-      - pattern: builder.AllowAnyOrigin()
+      - pattern-either:
+          # Permissive CORS policies
+          - pattern: builder.AllowAnyOrigin()
+          - pattern: builder.AllowAnyHeader()
+          - pattern: builder.AllowAnyMethod()
+          - pattern: builder.AllowCredentials().AllowAnyOrigin()
+          # Wildcard origins
+          - pattern: builder.WithOrigins("*")
+          - pattern: builder.SetIsOriginAllowed(origin => true)
+          # Missing CORS validation
+          - pattern: app.UseCors()
     note: |
       ## Remediation
       Specify allowed origins explicitly in CORS policy.

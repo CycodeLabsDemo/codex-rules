@@ -1,0 +1,46 @@
+rules:
+  - id: xamarin-insecure-data-storage
+    message: |
+      Storing sensitive data in ApplicationData or Preferences without encryption is insecure.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-311: Missing Encryption of Sensitive Data"
+      owasp:
+        - "M2: Insecure Data Storage"
+      category: security
+      technology:
+        - xamarin
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - data-storage
+        - xamarin
+        - security
+    patterns:
+      - patterns:
+          - pattern-either:
+              - pattern: Preferences.Set($KEY, $VALUE)
+              - pattern: ApplicationData.Current.LocalSettings.Values[$KEY] = $VALUE
+              - pattern: IsolatedStorageFile.GetUserStoreForApplication()
+              - pattern: File.WriteAllText($PATH, $DATA)
+          - metavariable-pattern:
+              metavariable: $KEY
+              pattern-either:
+                - pattern: $"*password*"
+                - pattern: $"*token*"
+                - pattern: $"*secret*"
+                - pattern: $"*key*"
+                - pattern: $"*pin*"
+          - pattern-not-inside: |
+              var $ENCRYPTED = $CRYPTO.Encrypt($VALUE);
+              ...
+    note: |
+      ## Remediation
+      Use SecureStorage for sensitive data:
+      ```csharp
+      await SecureStorage.SetAsync("password", encryptedPassword);
+      ```
+      Or encrypt data before storing in Preferences.

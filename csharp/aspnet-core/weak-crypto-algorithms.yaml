@@ -1,0 +1,44 @@
+rules:
+  - id: aspnet-core-weak-crypto-algorithms
+    message: |
+      Using weak cryptographic algorithms (MD5, SHA1, DES, RC4) compromises data security.
+    severity: ERROR
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-327: Use of a Broken or Risky Cryptographic Algorithm"
+      owasp:
+        - "A02:2021 - Cryptographic Failures"
+      category: security
+      technology:
+        - aspnet-core
+      references:
+        - https://owasp.org/www-project-top-ten/
+      labels:
+        - crypto
+        - aspnet-core
+        - security
+    patterns:
+      - pattern-either:
+          # Weak hash algorithms
+          - pattern: MD5.Create()
+          - pattern: SHA1.Create()
+          - pattern: new MD5CryptoServiceProvider()
+          - pattern: new SHA1CryptoServiceProvider()
+          # Weak encryption algorithms
+          - pattern: DES.Create()
+          - pattern: new DESCryptoServiceProvider()
+          - pattern: RC2.Create()
+          - pattern: new RC2CryptoServiceProvider()
+          # Weak symmetric algorithms
+          - pattern: SymmetricAlgorithm.Create("DES")
+          - pattern: SymmetricAlgorithm.Create("RC2")
+          - pattern: CryptoConfig.CreateFromName("MD5")
+          - pattern: CryptoConfig.CreateFromName("SHA1")
+    note: |
+      ## Remediation
+      Use secure cryptographic algorithms:
+      - For hashing: SHA-256, SHA-384, SHA-512
+      - For encryption: AES-256, ChaCha20
+      - For password hashing: bcrypt, scrypt, PBKDF2

@@ -1,0 +1,42 @@
+rules:
+  - id: unity-unencrypted-networking
+    message: |
+      Unity networking code using unencrypted protocols exposes sensitive game data.
+    severity: WARNING
+    languages:
+      - csharp
+    metadata:
+      cwe:
+        - "CWE-319: Cleartext Transmission of Sensitive Information"
+      owasp:
+        - "M3: Insecure Communication"
+      category: security
+      technology:
+        - unity
+        - networking
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+      labels:
+        - networking
+        - unity
+        - security
+    patterns:
+      - pattern-either:
+          # Unity Netcode/Multiplayer without encryption
+          - pattern: NetworkManager.Singleton.StartHost()
+          - pattern: NetworkManager.Singleton.StartClient()
+          - pattern: NetworkManager.Singleton.StartServer()
+          # Mirror Networking without encryption
+          - pattern: NetworkServer.Listen($PORT)
+          - pattern: NetworkClient.Connect($HOST, $PORT)
+          # Custom UDP/TCP sockets
+          - pattern: new UdpClient($PORT)
+          - pattern: new TcpClient($HOST, $PORT)
+          - pattern: new TcpListener($IP, $PORT)
+    note: |
+      ## Remediation
+      Use encrypted networking protocols:
+      - Enable NetworkManager encryption
+      - Use HTTPS for web requests
+      - Implement TLS for custom sockets
+      - Consider using Unity's secure networking solutions
