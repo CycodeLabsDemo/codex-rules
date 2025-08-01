@@ -20,12 +20,23 @@ rules:
         - unity
         - security
     patterns:
-      - pattern: $CONN.CreateCommand().CommandText = $QUERY
-      - metavariable-pattern:
-          metavariable: $QUERY
-          pattern-either:
-            - pattern: $ANY + $USERINPUT
-            - pattern: string.Format($FMT, $USERINPUT)
+      - patterns:
+          - pattern-either:
+              # Direct string concatenation in SQL
+              - pattern: $CONN.CreateCommand().CommandText = $QUERY
+              - pattern: new SqliteCommand($QUERY, $CONN)
+              - pattern: $CMD.CommandText = $QUERY
+              # Unity specific database patterns
+              - pattern: $DB.Execute($QUERY)
+              - pattern: $DB.Query<$TYPE>($QUERY)
+          - metavariable-pattern:
+              metavariable: $QUERY
+              pattern-either:
+                - pattern: $PREFIX + $USERINPUT
+                - pattern: $"...{$USERINPUT}..."
+                - pattern: string.Format($FMT, $USERINPUT)
+                - pattern: string.Concat($PARTS)
+          - pattern-not: $CONN.CreateCommand().CommandText = $QUERY, $PARAMS
     note: |
       ## Remediation
       Use parameterized queries or ORM features instead of string concatenation.

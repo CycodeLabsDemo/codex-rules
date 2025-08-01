@@ -20,7 +20,20 @@ rules:
         - aspnet-core
         - security
     patterns:
-      - pattern: app.UseDeveloperExceptionPage()
+      - patterns:
+          - pattern: app.UseDeveloperExceptionPage()
+          - pattern-not-inside: |
+              if (env.IsDevelopment())
+              {
+                ...
+                app.UseDeveloperExceptionPage();
+                ...
+              }
+          - pattern-not-inside: |
+              if ($ENV.IsDevelopment())
+              {
+                ...
+              }
     note: |
       ## Remediation
       Use Developer Exception Page only in development and disable it in production.

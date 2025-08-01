@@ -20,7 +20,18 @@ rules:
         - aspnet-mvc
         - security
     patterns:
-      - pattern: "@Html.Raw(ViewBag.$PROP)"
+      - pattern-either:
+          # ViewBag data rendered raw
+          - pattern: "@Html.Raw(ViewBag.$PROP)"
+          - pattern: "@Html.Raw(ViewData[$KEY])"
+          - pattern: "@Html.Raw(TempData[$KEY])"
+          # Direct output without encoding
+          - pattern: "@ViewBag.$PROP"
+          - pattern: "@ViewData[$KEY]"
+          - pattern: "@TempData[$KEY]"
+          # HtmlString creation
+          - pattern: "new HtmlString(ViewBag.$PROP)"
+          - pattern: "new HtmlString(ViewData[$KEY])"
     note: |
       ## Remediation
       Use Html.Encode when rendering content from ViewBag.

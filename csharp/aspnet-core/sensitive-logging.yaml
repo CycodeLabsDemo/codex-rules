@@ -20,12 +20,32 @@ rules:
         - aspnet-core
         - security
     patterns:
-      - pattern-either:
-          - pattern: logger.LogInformation($DATA)
-          - pattern: logger.LogError($DATA)
-      - metavariable-pattern:
-          metavariable: $DATA
-          pattern: Request.$SRC[$KEY]
+      - patterns:
+          - pattern-either:
+              # Direct logging of request data
+              - pattern: $LOGGER.LogInformation($DATA)
+              - pattern: $LOGGER.LogError($DATA)
+              - pattern: $LOGGER.LogWarning($DATA)
+              - pattern: $LOGGER.LogDebug($DATA)
+              - pattern: $LOGGER.LogTrace($DATA)
+              - pattern: $LOGGER.LogCritical($DATA)
+              # String interpolation in logging
+              - pattern: $LOGGER.LogInformation($"...{$DATA}...")
+              - pattern: $LOGGER.LogError($"...{$DATA}...")
+          - metavariable-pattern:
+              metavariable: $DATA
+              pattern-either:
+                - pattern: Request.$SRC[$KEY]
+                - pattern: HttpContext.Request.$SRC[$KEY]
+                - pattern: $USER.Password
+                - pattern: $USER.Token
+                - pattern: $AUTH.Secret
+          - pattern-not-inside: |
+              var $SAFE = SanitizeForLogging($DATA);
+              ...
+          - pattern-not-inside: |
+              if ($DATA.Length > 0) $DATA = "***";
+              ...
     note: |
       ## Remediation
       Avoid logging sensitive or user-provided data.

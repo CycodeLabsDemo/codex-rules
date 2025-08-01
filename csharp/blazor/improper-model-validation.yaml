@@ -20,10 +20,22 @@ rules:
         - blazor
         - security
     patterns:
-      - pattern-regex: '<EditForm\s+Model=".*"\s+OnValidSubmit=".*".*>'
-      - pattern-not-inside: |
-          EditContext $CTX = new EditContext($MODEL);
-          $CTX.Validate();
+      - patterns:
+          - pattern-either:
+              # EditForm without validation attributes
+              - pattern-regex: '<EditForm\s+Model="@.*"\s+OnValidSubmit=".*"[^>]*>'
+              - pattern-regex: '<EditForm\s+OnValidSubmit=".*"\s+Model="@.*"[^>]*>'
+          - pattern-not-regex: '.*OnInvalidSubmit.*'
+          - pattern-not-regex: '.*DataAnnotationsValidator.*'
+          - pattern-not-regex: '.*ValidationSummary.*'
+          - pattern-not-inside: |
+              <EditForm Model="@$MODEL" OnValidSubmit="$HANDLER">
+                <DataAnnotationsValidator />
+                ...
+              </EditForm>
+          - pattern-not-inside: |
+              EditContext $CTX = new EditContext($MODEL);
+              $CTX.Validate();
     note: |
       ## Remediation
       Use EditContext.Validate or DataAnnotations to validate forms.

@@ -20,13 +20,30 @@ rules:
         - aspnet-core
         - security
     patterns:
-      - pattern-either:
-          - pattern: File.ReadAllText($PATH)
-          - pattern: File.WriteAllText($PATH, ...)
-          - pattern: FileStream($PATH, ...)
-      - metavariable-pattern:
-          metavariable: $PATH
-          pattern: Request.$SRC[$KEY]
+      - patterns:
+          - pattern-either:
+              # File operations with user input
+              - pattern: File.ReadAllText($PATH)
+              - pattern: File.WriteAllText($PATH, ...)
+              - pattern: File.ReadAllBytes($PATH)
+              - pattern: File.WriteAllBytes($PATH, ...)
+              - pattern: new FileStream($PATH, ...)
+              - pattern: System.IO.File.OpenRead($PATH)
+              - pattern: System.IO.File.OpenWrite($PATH)
+              - pattern: Directory.GetFiles($PATH)
+              - pattern: Directory.CreateDirectory($PATH)
+          - metavariable-pattern:
+              metavariable: $PATH
+              pattern-either:
+                - pattern: Request.$SRC[$KEY]
+                - pattern: $USERPATH + $INPUT
+                - pattern: $"...{Request.$SRC[$KEY]}..."
+          - pattern-not-inside: |
+              var $SAFE = Path.GetFileName($PATH);
+              ...
+          - pattern-not-inside: |
+              if (Path.IsPathRooted($PATH)) return;
+              ...
     note: |
       ## Remediation
       Validate and sanitize file paths before use.

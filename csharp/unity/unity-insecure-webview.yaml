@@ -22,16 +22,36 @@ rules:
         - security
     patterns:
       - pattern-either:
+          # Loading untrusted URLs
           - patterns:
-              - pattern: $WEBVIEW.LoadURL($INPUT)
+              - pattern-either:
+                  - pattern: $WEBVIEW.LoadURL($INPUT)
+                  - pattern: $WEBVIEW.url = $INPUT
+                  - pattern: $WEBVIEW.LoadHtml($INPUT)
               - metavariable-pattern:
                   metavariable: $INPUT
                   pattern-either:
                     - pattern: PlayerPrefs.GetString($KEY)
                     - pattern: Request.$SRC[$KEY]
+                    - pattern: $USERDATA + $SUFFIX
+                    - pattern: $"...{PlayerPrefs.GetString($KEY)}..."
+              - pattern-not-inside: |
+                  if (Uri.TryCreate($INPUT, UriKind.Absolute, out var $URI) && $URI.Scheme == Uri.UriSchemeHttps)
+                  {
+                    ...
+                  }
+          # JavaScript evaluation with user input
           - patterns:
-              - pattern: $WEBVIEW.EvaluateJS($SCRIPT)
+              - pattern-either:
+                  - pattern: $WEBVIEW.EvaluateJS($SCRIPT)
+                  - pattern: $WEBVIEW.EvaluateJavaScript($SCRIPT)
               - pattern-not: $WEBVIEW.EvaluateJS("...")
+              - pattern-not: $WEBVIEW.EvaluateJavaScript("...")
+              - metavariable-pattern:
+                  metavariable: $SCRIPT
+                  pattern-either:
+                    - pattern: $PREFIX + $USERDATA
+                    - pattern: $"...{$USERDATA}..."
     note: |
       ## Remediation
       Validate URLs before loading and avoid executing untrusted scripts.

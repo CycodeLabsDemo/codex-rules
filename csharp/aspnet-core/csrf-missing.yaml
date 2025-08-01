@@ -20,17 +20,44 @@ rules:
         - aspnet-core
         - security
     patterns:
-      - pattern: |
-          public IActionResult $ACTION(...)
-          {
-            ...
-          }
-      - pattern-not-inside: |
-          [ValidateAntiForgeryToken]
-          public IActionResult $ACTION(...)
-          {
-            ...
-          }
+      - patterns:
+          - pattern-either:
+              # POST actions without CSRF protection
+              - pattern: |
+                  [HttpPost]
+                  public IActionResult $ACTION(...)
+                  {
+                    ...
+                  }
+              - pattern: |
+                  [HttpPost]
+                  public async Task<IActionResult> $ACTION(...)
+                  {
+                    ...
+                  }
+              # PUT actions
+              - pattern: |
+                  [HttpPut]
+                  public IActionResult $ACTION(...)
+                  {
+                    ...
+                  }
+              # DELETE actions  
+              - pattern: |
+                  [HttpDelete]
+                  public IActionResult $ACTION(...)
+                  {
+                    ...
+                  }
+          - pattern-not-inside: |
+              [ValidateAntiForgeryToken]
+              ...
+          - pattern-not-inside: |
+              [AutoValidateAntiforgeryToken]
+              ...
+          - pattern-not-inside: |
+              [IgnoreAntiforgeryToken]
+              ...
     note: |
       ## Remediation
       Use [ValidateAntiForgeryToken] on state-changing actions.

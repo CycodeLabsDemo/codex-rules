@@ -20,7 +20,23 @@ rules:
         - aspnet-mvc
         - security
     patterns:
-      - pattern: Response.Cookies.Append($NAME, $VAL)
+      - patterns:
+          - pattern-either:
+              - pattern: Response.Cookies.Append($NAME, $VAL)
+              - pattern: Response.Cookies.Add($NAME, $VAL)
+              - pattern: Response.Cookies.Set($NAME, $VAL)
+          - pattern-not-inside: |
+              var $OPTS = new CookieOptions
+              {
+                ...
+                Secure = true,
+                ...
+                HttpOnly = true,
+                ...
+              };
+              ...
+          - pattern-not: Response.Cookies.Append($NAME, $VAL, $OPTS)
+          - pattern-not: Response.Cookies.Add($NAME, $VAL, $OPTS)
     note: |
       ## Remediation
       Set Secure and HttpOnly on cookies containing sensitive information.

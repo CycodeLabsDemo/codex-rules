@@ -20,7 +20,31 @@ rules:
         - aspnet-mvc
         - security
     patterns:
-      - pattern: SqlCommand($QUERY + $INPUT)
+      - pattern-either:
+          # Direct string concatenation in SQL commands
+          - patterns:
+              - pattern-either:
+                  - pattern: new SqlCommand($QUERY + $INPUT, ...)
+                  - pattern: new SqlCommand($"...{$INPUT}...", ...)
+                  - pattern: $CMD.CommandText = $QUERY + $INPUT
+                  - pattern: $CMD.CommandText = $"...{$INPUT}..."
+              - pattern-not: new SqlCommand($QUERY, $CONN, $PARAMS)
+          # Entity Framework raw SQL with interpolation
+          - patterns:
+              - pattern-either:
+                  - pattern: $CTX.Database.ExecuteSqlCommand($QUERY + $INPUT)
+                  - pattern: $CTX.Database.ExecuteSqlCommand($"...{$INPUT}...")
+                  - pattern: $CTX.Database.SqlQuery<$TYPE>($QUERY + $INPUT)
+                  - pattern: $CTX.Database.SqlQuery<$TYPE>($"...{$INPUT}...")
+              - pattern-not: $CTX.Database.ExecuteSqlCommand($QUERY, $PARAMS)
+          # Direct concatenation with user input sources
+          - patterns:
+              - pattern-either:
+                  - pattern: SqlCommand($QUERY + Request.$SRC[$KEY])
+                  - pattern: SqlCommand($"...{Request.$SRC[$KEY]}...")
+              - metavariable-regex:
+                  metavariable: $SRC
+                  regex: "^(QueryString|Form|Params)$"
     note: |
       ## Remediation
       Use parameterized queries or ORM methods instead of string concatenation.
