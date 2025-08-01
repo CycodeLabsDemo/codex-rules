@@ -20,14 +20,29 @@ rules:
         - unity
         - security
     patterns:
-      - pattern-either:
-          - pattern: Debug.Log($MSG)
-          - pattern: UnityEngine.Debug.Log($MSG)
-      - metavariable-pattern:
-          metavariable: $MSG
-          pattern-either:
-            - pattern: Request.$SRC[$KEY]
-            - pattern: Request[$KEY]
+      - patterns:
+          - pattern-either:
+              - pattern: Debug.Log($MSG)
+              - pattern: UnityEngine.Debug.Log($MSG)
+              - pattern: Debug.LogError($MSG)
+              - pattern: Debug.LogWarning($MSG)
+              - pattern: Console.WriteLine($MSG)
+              # String interpolation in logs
+              - pattern: Debug.Log($"...{$DATA}...")
+              - pattern: Debug.LogError($"...{$DATA}...")
+          - metavariable-pattern:
+              metavariable: $MSG
+              pattern-either:
+                - pattern: PlayerPrefs.GetString($KEY)
+                - pattern: $NETWORKDATA + $SUFFIX
+                - pattern: $USERDATA.ToString()
+                - pattern: $"User input: {$INPUT}"
+          - pattern-not-inside: |
+              var $CLEAN = SanitizeLogMessage($MSG);
+              ...
+          - pattern-not-inside: |
+              if ($MSG.Contains("\n") || $MSG.Contains("\r")) return;
+              ...
     note: |
       ## Remediation
       Sanitize log messages or avoid logging untrusted user input.

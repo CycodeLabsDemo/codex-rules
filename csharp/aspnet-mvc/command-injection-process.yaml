@@ -20,7 +20,24 @@ rules:
         - aspnet-mvc
         - security
     patterns:
-      - pattern: Process.Start($INPUT)
+      - patterns:
+          - pattern-either:
+              - pattern: Process.Start($INPUT)
+              - pattern: System.Diagnostics.Process.Start($INPUT)
+              - pattern: new ProcessStartInfo($INPUT)
+              - pattern: $PSI.FileName = $INPUT
+              - pattern: $PSI.Arguments = $ARGS
+          - metavariable-pattern:
+              metavariable: $INPUT
+              pattern-either:
+                - pattern: Request.$SRC[$KEY]
+                - pattern: HttpContext.Request.$SRC[$KEY]
+                - pattern: $USERDATA + $SUFFIX
+                - pattern: $"...{Request.$SRC[$KEY]}..."
+          - pattern-not-inside: |
+              var $WHITELIST = new[] { "allowed.exe", "safe.bat" };
+              if (!$WHITELIST.Contains(Path.GetFileName($INPUT))) return;
+              ...
     note: |
       ## Remediation
       Avoid executing shell commands with user input or use parameterized APIs.

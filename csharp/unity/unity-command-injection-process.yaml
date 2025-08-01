@@ -20,14 +20,24 @@ rules:
         - unity
         - security
     patterns:
-      - pattern-either:
-          - pattern: Process.Start($CMD)
-          - pattern: System.Diagnostics.Process.Start($CMD)
-      - metavariable-pattern:
-          metavariable: $CMD
-          pattern-either:
-            - pattern: Request.$SRC[$KEY]
-            - pattern: Request[$KEY]
+      - patterns:
+          - pattern-either:
+              - pattern: Process.Start($CMD)
+              - pattern: System.Diagnostics.Process.Start($CMD)
+              - pattern: new ProcessStartInfo($CMD)
+              - pattern: $PSI.FileName = $CMD
+              - pattern: $PSI.Arguments = $ARGS
+          - metavariable-pattern:
+              metavariable: $CMD
+              pattern-either:
+                - pattern: PlayerPrefs.GetString($KEY)
+                - pattern: $NETWORKDATA + $SUFFIX
+                - pattern: $USERDATA.ToString()
+                - pattern: $"...{PlayerPrefs.GetString($KEY)}..."
+          - pattern-not-inside: |
+              var $ALLOWED = new[] { "notepad.exe", "unity.exe" };
+              if (!$ALLOWED.Contains(Path.GetFileName($CMD))) return;
+              ...
     note: |
       ## Remediation
       Avoid executing system commands with untrusted input.

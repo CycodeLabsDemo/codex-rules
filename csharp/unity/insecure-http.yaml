@@ -20,12 +20,30 @@ rules:
         - unity
         - security
     patterns:
-      - pattern-either:
-          - pattern: UnityWebRequest.Get($URL)
-          - pattern: new WWW($URL)
-      - metavariable-regex:
-          metavariable: $URL
-          regex: '^"http://'
+      - patterns:
+          - pattern-either:
+              - pattern: UnityWebRequest.Get($URL)
+              - pattern: UnityWebRequest.Post($URL, ...)
+              - pattern: UnityWebRequest.Put($URL, ...)
+              - pattern: UnityWebRequest.Delete($URL)
+              - pattern: new WWW($URL)
+              - pattern: new WWW($URL, $DATA)
+              - pattern: UnityWebRequest.SendWebRequest($URL)
+          - pattern-either:
+              # Hardcoded HTTP URLs
+              - metavariable-regex:
+                  metavariable: $URL
+                  regex: '^"http://[^"]*"$'
+              # Dynamic URLs with HTTP
+              - patterns:
+                  - metavariable-pattern:
+                      metavariable: $URL
+                      pattern-either:
+                        - pattern: $BASEURL + $PATH
+                        - pattern: $"http://{$HOST}..."
+                        - pattern: string.Format("http://{0}", $HOST)
+          - pattern-not-inside: |
+              if ($URL.StartsWith("https://")) { ... }
     note: |
       ## Remediation
       Use HTTPS for network requests or enforce secure connections.

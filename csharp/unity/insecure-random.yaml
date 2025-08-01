@@ -20,9 +20,27 @@ rules:
         - unity
         - security
     patterns:
-      - pattern-either:
-          - pattern: UnityEngine.Random.Range($A, $B)
-          - pattern: Random.Range($A, $B)
+      - patterns:
+          - pattern-either:
+              - pattern: UnityEngine.Random.Range($A, $B)
+              - pattern: Random.Range($A, $B)
+              - pattern: UnityEngine.Random.value
+              - pattern: Random.value
+              - pattern: UnityEngine.Random.insideUnitSphere
+              - pattern: Random.insideUnitSphere
+          - pattern-inside: |
+              class $CLASS
+              {
+                ...
+                $METHOD($PARAMS)
+                {
+                  ...
+                }
+                ...
+              }
+          - metavariable-regex:
+              metavariable: $METHOD
+              regex: (?i).*(token|key|password|secret|salt|nonce|session|auth|crypto).*
     note: |
       ## Remediation
       Use System.Security.Cryptography.RandomNumberGenerator for security-related randomness.

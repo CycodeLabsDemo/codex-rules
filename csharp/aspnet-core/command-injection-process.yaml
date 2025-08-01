@@ -20,10 +20,27 @@ rules:
         - aspnet-core
         - security
     patterns:
-      - pattern: Process.Start($CMD)
-      - metavariable-pattern:
-          metavariable: $CMD
-          pattern: Request.$SRC[$KEY]
+      - patterns:
+          - pattern-either:
+              - pattern: Process.Start($CMD)
+              - pattern: System.Diagnostics.Process.Start($CMD)
+              - pattern: new ProcessStartInfo($CMD)
+              - pattern: $PSI.FileName = $CMD
+              - pattern: $PSI.Arguments = $ARGS
+          - metavariable-pattern:
+              metavariable: $CMD
+              pattern-either:
+                - pattern: Request.$SRC[$KEY]
+                - pattern: HttpContext.Request.$SRC[$KEY]
+                - pattern: $USERDATA + $SUFFIX
+                - pattern: $"...{Request.$SRC[$KEY]}..."
+          - pattern-not-inside: |
+              var $SAFE = Path.GetFileName($CMD);
+              ...
+          - pattern-not-inside: |
+              var $WHITELIST = new[] { "notepad.exe", "calc.exe" };
+              if (!$WHITELIST.Contains($CMD)) return;
+              ...
     note: |
       ## Remediation
       Avoid executing commands with untrusted input or sanitize parameters.

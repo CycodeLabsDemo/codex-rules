@@ -20,9 +20,27 @@ rules:
         - xamarin
         - security
     patterns:
-      - pattern-either:
-          - pattern: Process.Start($CMD)
-          - pattern: System.Diagnostics.Process.Start($CMD)
+      - patterns:
+          - pattern-either:
+              - pattern: Process.Start($CMD)
+              - pattern: System.Diagnostics.Process.Start($CMD)
+              - pattern: ProcessStartInfo($CMD)
+              - pattern: $PSI.FileName = $CMD
+              - pattern: $PSI.Arguments = $ARGS
+          - metavariable-pattern:
+              metavariable: $CMD
+              pattern-either:
+                - pattern: Preferences.Get($KEY, ...)
+                - pattern: SecureStorage.GetAsync($KEY)
+                - pattern: $USERDATA + $SUFFIX
+                - pattern: $"...{$USERDATA}..."
+          - pattern-not-inside: |
+              var $SAFE = Path.GetFileName($CMD);
+              ...
+          - pattern-not-inside: |
+              var $ALLOWED = new[] { "notepad.exe", "calc.exe" };
+              if (!$ALLOWED.Contains($CMD)) return;
+              ...
     note: |
       ## Remediation
       Avoid executing system commands with untrusted input.
